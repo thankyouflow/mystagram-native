@@ -26,7 +26,7 @@ export const logUserOut = async () => {
 };
 
 const httpLink = createHttpLink({
-  uri: "https://grumpy-pig-21.loca.lt/graphql",
+  uri: "https://white-badger-17.loca.lt/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {

@@ -30,12 +30,11 @@ export default function Login({ route: { params } }) {
     const {
       login: { ok, token },
     } = data;
-    console.log(ok)
     if (ok) {
       await logUserIn(token);
     }
   };
-  const [logInMutation, { loading }] = useMutation(LOGIN_MUTATION, {
+  const [logInMutation, { loading, error }] = useMutation(LOGIN_MUTATION, {
     onCompleted,
   });
   const onNext = (nextOne) => {
