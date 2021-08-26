@@ -8,6 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   useWindowDimensions,
+  Platform
 } from "react-native";
 import { colors } from "../colors";
 
@@ -45,28 +46,38 @@ export default function SelectPhoto({ navigation }) {
   const [photos, setPhotos] = useState([]);
   const [chosenPhoto, setChosenPhoto] = useState("");
   const getPhotos = async () => {
-    const { assets: photos } = await MediaLibrary.getAssetsAsync();
-    setPhotos(photos);
-    setChosenPhoto(photos[0]?.uri);
+    if(Platform.OS === 'ios' || Platform.OS === 'android'){
+      const { assets: photos } = await MediaLibrary.getAssetsAsync();
+      setPhotos(photos);
+      setChosenPhoto(photos[0]?.uri);
+    }
   };
   const getPermissions = async () => {
-    const {
-      accessPrivileges,
-      canAskAgain,
-    } = await MediaLibrary.getPermissionsAsync();
-    if (accessPrivileges === "none" && canAskAgain) {
-      const { accessPrivileges } = await MediaLibrary.requestPermissionsAsync();
-      if (accessPrivileges !== "none") {
+    if(Platform.OS === 'ios' || Platform.OS === 'android'){
+      const {
+        accessPrivileges,
+        canAskAgain,
+      } = await MediaLibrary.getPermissionsAsync();
+      if (accessPrivileges === "none" && canAskAgain) {
+        const { accessPrivileges } = await MediaLibrary.requestPermissionsAsync();
+        if (accessPrivileges !== "none") {
+          setOk(true);
+          getPhotos();
+        }
+      } else if (accessPrivileges !== "none") {
         setOk(true);
         getPhotos();
       }
-    } else if (accessPrivileges !== "none") {
-      setOk(true);
-      getPhotos();
     }
   };
   const HeaderRight = () => (
-    <TouchableOpacity>
+    <TouchableOpacity
+    onPress={() =>
+      navigation.navigate("UploadForm", {
+        file: chosenPhoto,
+      })
+    }
+  >
       <HeaderRightText>Next</HeaderRightText>
     </TouchableOpacity>
   );
@@ -77,7 +88,7 @@ export default function SelectPhoto({ navigation }) {
     navigation.setOptions({
       headerRight: HeaderRight,
     });
-  }, []);
+  }, [chosenPhoto]);
   const numColumns = 4;
   const { width } = useWindowDimensions();
   const choosePhoto = (uri) => {
@@ -100,7 +111,7 @@ export default function SelectPhoto({ navigation }) {
   );
   return (
     <Container>
-      <StatusBar />
+      <StatusBar hidden={false} />
       <Top>
         {chosenPhoto !== "" ? (
           <Image

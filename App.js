@@ -44,6 +44,7 @@ export default function App() {
       />
     );
   }
+  console.log(isLoggedIn)
   return (
     <ApolloProvider client={client}>
       <NavigationContainer>
